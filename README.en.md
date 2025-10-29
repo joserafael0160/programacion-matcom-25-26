@@ -22,10 +22,6 @@
         Content
     </a>
     <span>&nbsp;✦&nbsp;</span>
-    <a href="#-practical-classes" target="_blank">
-        Practical Classes
-    </a>
-    <span>&nbsp;✦&nbsp;</span>
     <a href="#-technologies" target="_blank">
         Technologies
     </a>

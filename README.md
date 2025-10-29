@@ -21,10 +21,6 @@
         Contenido
     </a>
     <span>&nbsp;✦&nbsp;</span>
-    <a href="#-clases-prácticas" target="_blank">
-        Clases Prácticas
-    </a>
-    <span>&nbsp;✦&nbsp;</span>
     <a href="#-tecnologías" target="_blank">
         Tecnologías
     </a>
