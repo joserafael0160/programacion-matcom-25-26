@@ -1,0 +1,249 @@
+\documentclass[12pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} % Eliminar si usas LuaLaTeX o XeLaTeX
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{shapes, positioning, arrows.meta}
+\usepackage{listings}
+\usepackage{listingsutf8} % Para acentos en listings
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage[hidelinks]{hyperref}
+
+% Geometry and lists
+\geometry{a4paper, margin=1in}
+\setlist[enumerate]{itemsep=2pt, topsep=5pt}
+\setlist[itemize]{itemsep=2pt, topsep=5pt}
+
+% Listings config
+\lstset{
+  inputencoding=utf8,
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{green!60!black},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  frame=single,
+  breaklines=true,
+  captionpos=b
+}
+
+\title{\textbf{Soluciones - CP0}}
+\author{José Rafael Pérez Rivero C-122}
+\date{29 octubre 2025}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problema 1: Las 12 Monedas}
+
+\subsection*{Solución}
+
+Dividimos las 12 monedas en tres grupos de 4: Grupo A, Grupo B, Grupo C.
+
+\subsubsection*{Primera Pesada: A vs B}
+
+\begin{itemize}
+    \item \textbf{Caso 1: $A = B$} $\rightarrow$ La falsa está en C
+    \item \textbf{Caso 2: $A < B$} $\rightarrow$ La falsa está en A (si es más ligera) o en B (si es más pesada)
+    \item \textbf{Caso 3: $A > B$} $\rightarrow$ La falsa está en A (si es más pesada) o en B (si es más ligera)
+\end{itemize}
+
+\subsubsection*{Segunda Pesada (Caso $A = B$):}
+Pesamos 3 monedas de C contra 3 monedas buenas de A:
+\begin{itemize}
+    \item Si se equilibran: La moneda restante en C es falsa (tercera pesada para determinar si es más pesada/ligera)
+    \item Si $C < A$: Una de las 3 de C es más ligera
+    \item Si $C > A$: Una de las 3 de C es más pesada
+\end{itemize}
+
+\subsubsection*{Tercera Pesada:}
+Con solo 3 monedas sospechosas, pesamos 1 vs 1:
+\begin{itemize}
+    \item Si igualan: La tercera es falsa
+    \item Si no: La más ligera/pesada según el caso anterior
+\end{itemize}
+
+\subsection*{Complejidad}
+\begin{itemize}
+    \item Número máximo de pesadas: 3
+    \item Estrategia: \textbf{Búsqueda ternaria}
+\end{itemize}
+
+\section*{Problema 2: Torres de Hanoi}
+
+\subsection*{Solución Matemática}
+
+Definimos $T(n)$ como el número mínimo de movimientos para $n$ discos:
+
+\[
+T(n) = \begin{cases}
+1 & \text{si } n = 1 \\
+2T(n-1) + 1 & \text{si } n > 1
+\end{cases}
+\]
+
+Resolviendo la recurrencia:
+\[
+T(n) = 2^n - 1
+\]
+
+\subsection*{Algoritmo Recursivo}
+
+\begin{lstlisting}
+def hanoi(n, origen, destino, auxiliar):
+    if n == 1:
+        print(f"Mover disco 1 de {origen} a {destino}")
+        return
+    # Mover n-1 discos de origen a auxiliar usando destino como auxiliar
+    hanoi(n-1, origen, auxiliar, destino)
+    # Mover el disco n de origen a destino
+    print(f"Mover disco {n} de {origen} a {destino}")
+    # Mover n-1 discos de auxiliar a destino usando origen como auxiliar
+    hanoi(n-1, auxiliar, destino, origen)
+
+# Ejemplo para 3 discos
+hanoi(3, 'A', 'C', 'B')
+\end{lstlisting}
+
+\subsection*{Explicación del Algoritmo}
+\begin{enumerate}
+    \item \textbf{Caso base:} Si solo hay 1 disco, moverlo directamente del origen al destino
+    \item \textbf{Paso recursivo:}
+    \begin{itemize}
+        \item Mover $n-1$ discos del origen al auxiliar (usando el destino como auxiliar temporal)
+        \item Mover el disco $n$ (el más grande) del origen al destino
+        \item Mover los $n-1$ discos del auxiliar al destino (usando el origen como auxiliar temporal)
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{Ejemplo para 3 discos}
+\begin{verbatim}
+Mover disco 1 de A a C
+Mover disco 2 de A a B
+Mover disco 1 de C a B
+Mover disco 3 de A a C
+Mover disco 1 de B a A
+Mover disco 2 de B a C
+Mover disco 1 de A a C
+\end{verbatim}
+
+\subsection*{Análisis}
+\begin{itemize}
+    \item \textbf{Tiempo:} $O(2^n)$
+    \item \textbf{Espacio:} $O(n)$ (pila de recursión)
+\end{itemize}
+
+\section*{Problema 3: Los Puentes de Königsberg}
+\subsection*{Modelado como Grafo}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    \node[circle, draw, fill=blue!20] (A) at (0,2) {A};
+    \node[circle, draw, fill=red!20] (B) at (2,2) {B};
+    \node[circle, draw, fill=green!20] (C) at (2,0) {C};
+    \node[circle, draw, fill=yellow!20] (D) at (0,0) {D};
+    
+    % Puentes
+    \draw[thick] (A) to[bend left=10] node[midway,above] {1} (B);
+    \draw[thick] (A) to[bend right=10] node[midway,below] {2} (B);
+    \draw[thick] (A) to node[midway,left] {3} (D);
+    \draw[thick] (B) to node[midway,right] {4} (D);
+    \draw[thick] (B) to[bend left=10] node[midway,right] {5} (C);
+    \draw[thick] (B) to[bend right=10] node[midway,left] {6} (C);
+    \draw[thick] (C) to node[midway,below] {7} (D);
+\end{tikzpicture}
+\end{center}
+
+\subsection*{Teorema de Euler}
+
+Un grafo conexo tiene un \textbf{circuito euleriano} si y solo si:
+\[
+\forall v \in V, \quad \deg(v) \text{ es par}
+\]
+
+\subsection*{Aplicación al Problema}
+
+Grados de los vértices:
+\begin{align*}
+\deg(A) &= 3 \quad \text{(impar)} \\
+\deg(B) &= 5 \quad \text{(impar)} \\
+\deg(C) &= 3 \quad \text{(impar)} \\
+\deg(D) &= 3 \quad \text{(impar)}
+\end{align*}
+
+\textbf{Conclusión:} \textcolor{red}{No existe solución} - Demasiados vértices de grado impar.
+
+\section*{Problema 4: Los Jarrones}
+
+\subsection*{Solución Paso a Paso}
+
+\begin{center}
+\begin{tabular}{c|c|l}
+Paso & Estado (5L, 3L) & Acción \\
+\hline
+0 & (0, 0) & Inicio \\
+1 & (5, 0) & Llenar jarro de 5L \\
+2 & (2, 3) & Verter 5L en 3L \\
+3 & (2, 0) & Vaciar jarro de 3L \\
+4 & (0, 2) & Verter 5L en 3L \\
+5 & (5, 2) & Llenar jarro de 5L \\
+6 & \textbf{(4, 3)} & Verter 5L en 3L (hasta llenar) \\
+\end{tabular}
+\end{center}
+
+\subsection*{Generalización}
+
+Para jarrones de capacidad $a$ y $b$, queremos medir $c$ litros. Solución existe si:
+\[
+\gcd(a, b) \mid c
+\]
+
+En nuestro caso: $\gcd(5, 3) = 1$ y $1 \mid 4$ $\rightarrow$ \textbf{Solución existe}.
+
+\section*{Problema 5: Prisioneros y Sombreros}
+\subsection*{Estrategia Óptima}
+
+Los prisioneros acuerdan usar \textbf{código de paridad}:
+
+\begin{itemize}
+    \item \textbf{Prisionero 1} (el último): Cuenta sombreros \textbf{negros} que ve
+    \begin{itemize}
+        \item Si es \textbf{par}: Dice "BLANCO"
+        \item Si es \textbf{impar}: Dice "NEGRO"
+    \end{itemize}
+    
+    \item \textbf{Prisioneros $2, \ldots, n$}: 
+    \begin{itemize}
+        \item Escuchan todas las respuestas anteriores
+        \item Cuentan sombreros negros que ven + información de paridad
+        \item Deducen su propio sombrero con certeza
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Ejemplo con 4 Prisioneros}
+
+Supongamos sombreros: [NEGRO, BLANCO, NEGRO, BLANCO]
+
+\begin{enumerate}
+    \item \textbf{P1} ve: [?, BLANCO, NEGRO, BLANCO] $\rightarrow$ 1 negro (impar) $\rightarrow$ Dice "NEGRO"
+    \item \textbf{P2} oye "NEGRO", ve [?, NEGRO, BLANCO] $\rightarrow$ Deducen que tiene BLANCO
+    \item \textbf{P3} oye "NEGRO, BLANCO", ve [?, BLANCO] $\rightarrow$ Deducen que tiene NEGRO  
+    \item \textbf{P4} oye todo $\rightarrow$ Deducen que tiene BLANCO
+\end{enumerate}
+
+\subsection*{Análisis de Eficiencia}
+
+\begin{itemize}
+    \item \textbf{Prisionero 1}: 50\% de éxito
+    \item \textbf{Prisioneros $2, \ldots, n$}: 100\% de éxito
+    \item \textbf{Eficiencia total}: $n-1$ salvados garantizados
+    \item \textbf{Técnica}: Codificación por paridad XOR
+\end{itemize}
+
+\end{document}
